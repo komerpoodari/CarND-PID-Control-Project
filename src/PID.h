@@ -17,6 +17,18 @@ public:
   double Ki;
   double Kd;
 
+  
+  /* 
+  * Some more useful parameters
+  */
+  double time_last;
+  double time_init;
+
+  double min_speed;
+  double max_speed;
+  double sum_speed;
+  unsigned int heart_beat;
+  
   /*
   * Constructor
   */
@@ -35,7 +47,7 @@ public:
   /*
   * Update the PID error variables given cross track error.
   */
-  void UpdateError(double cte);
+  void UpdateError(double cte, double speed);
 
   /*
   * Calculate the total PID error.

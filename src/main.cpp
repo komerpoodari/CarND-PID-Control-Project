@@ -28,12 +28,18 @@ std::string hasData(std::string s) {
   return "";
 }
 
-int main()
+int main(int argc, char *argv[])
 {
   uWS::Hub h;
-
+ 
   PID pid;
+
   // TODO: Initialize the pid variable.
+  double Kp_ini, Ki_ini, Kd_ini;
+  Kp_ini = atof(argv[1]);
+  Ki_ini = atof(argv[2]);
+  Kd_ini = atof(argv[3]);
+  pid.Init(Kp_ini, Ki_ini, Kd_ini);
 
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
@@ -51,19 +57,37 @@ int main()
           double speed = std::stod(j[1]["speed"].get<std::string>());
           double angle = std::stod(j[1]["steering_angle"].get<std::string>());
           double steer_value;
+          
+     
+          
           /*
           * TODO: Calcuate steering value here, remember the steering value is
           * [-1, 1].
           * NOTE: Feel free to play around with the throttle and speed. Maybe use
           * another PID controller to control the speed!
           */
-          
+          pid.UpdateError(cte, speed);
+          steer_value = pid.TotalError();
           // DEBUG
-          std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
+          //std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
 
           json msgJson;
           msgJson["steering_angle"] = steer_value;
-          msgJson["throttle"] = 0.3;
+          
+          double max_throttle = 0.8;
+          msgJson["throttle"] = 1.0 - fabs(steer_value);
+          if (msgJson["throttle"] > max_throttle)
+              msgJson["throttle"] = max_throttle;
+          /**
+          if (fabs(steer_value) > 0.8)
+            msgJson["throttle"] = -0.01;
+          else if (fabs(steer_value) > 0.5)
+            msgJson["throttle"] = 0.2;
+          else if (fabs(steer_value) > 0.3)
+            msgJson["throttle"] = 0.4;
+          else 
+            msgJson["throttle"] = 0.65;
+          **/
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
