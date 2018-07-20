@@ -90,6 +90,7 @@ int main()
           json msgJson;
           msgJson["steering_angle"] = steer_value;
           
+          // A simplied throttle schedule is implemented with hand-tuned parameter values.
           if (fabs(steer_value) > 0.9)
             msgJson["throttle"] = -0.00612;
           else if (fabs(steer_value) > 0.8)

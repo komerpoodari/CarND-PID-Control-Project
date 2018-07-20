@@ -1,5 +1,74 @@
 # CarND-Controls-PID
-Self-Driving Car Engineer Nanodegree Program
+# Self-Driving Car Engineer Nanodegree Program, Term-2
+
+---
+**This file is updated based on the assignment submission.**
+
+[//]: # (Image References)
+[image1]: ./state.png
+[image2]: ./twiddle.png
+
+# Assignment Implementation
+The relevant functions mentioned below are implemented in `main.cpp`.
+1. `main()` 
+    Important were the initializaton of gain parameter values for Proportional gain (`Kp_ini`),
+    Integral gain (`Ki_ini`) and Derivative gain (`Kd_ini`). I used a combination of manual tuning
+    and *TWIDDLE* covered in lesson lectures. The *TWIDDLE* tuning algorithm is implemented using
+    a state machine in `pid.cpp`.
+    
+
+The relevant functions mentioned below are implemented in `pid.cpp` and relevant changes 
+made in `pid.h'    
+2. `PID::Init()`
+    Most impotantly, the tuned gain parameters are initialized in this initialization function.
+    
+3. `PID::UpdateError()`
+    The error terms are updated in this function for proportional, integral and deriverative
+    aspects.  The integral error is reset at the beginning of each lap, to avoid relatively 
+    excessive influence on steering value computation.
+    
+    The *TWIDDLE* related state machine is implemented. The state machine updates one of the gain
+    parameters for each lap (equivalent to one robot run in lectures). The twiddle is only enabled
+    under a compile time macro. The following Figure illustrates high-level state diagram.
+    ![alt text][image1]
+    
+    The following snapshot illustrate typical *TWIDDLE* console output, which describes the 
+    algorithm seach for optimized error value.
+    ![alt text][image2]
+    
+4. `PID::TotalError()`
+    This functon simply computes steering value and with appropriate boundaries.
+
+   
+# Observations and Reflections
+Though the main implementation is simple, fine-tuning of gain values is time consuming.
+I followed an iterative approach with a combination of manual and *TWIDDLE*.
+- First I identified the approximate gain values manually starting in the order Kp, Kd and Ki.
+- Then engaged *TWIDDLE* to fine tune.
+- Another dimension throttle schedule. Because of this some times, even though error is best value,
+  the car behavior was not the best. I had to make manual decision.
+The following are the observations with gain parameters.
+## Proportional Gain (Kp)
+This is fundamentally important. In my case, I settled on ** Kp = -0.6405 **. 
+Using `Kp` alone, I could observe the oscillating behavior as observed in the video at the link, 
+https://youtu.be/Ip1jwMwHsUw .  In absence of appropriate amount of derivative feedback 
+instability (oscillation behavior) is expected.
+
+## Derivative Gain (Kd) Addition
+This is very important. In my case, I settled on ** Kd = -16.00**. The derivative feedback
+offers stability to the output.
+
+Using `Kp and Kd`, I could observe reasonably stable behavior as captured in the video at 
+the link, https://youtu.be/TOHkzHEoH5U . Basically derivative feedback smoothens the output.
+
+## Integral Gain (Ki) Addition
+In my observation, `Ki` impact was minor, as expected, since simulator seems to have no constant
+bias. I had reset `i_error to zero` for every lap to avoid relatively excessive accumulation of
+influence over multiple laps. In my case, I settled on ** Ki = -0.00016**. The integral feedback
+nullifies any constant equipment bias feeding into to the output.
+
+Using `Kp, Kd and Ki`, I could observe stable behavior as captured in the video at 
+the link, https://youtu.be/9118E5b3k2U . 
 
 ---
 
