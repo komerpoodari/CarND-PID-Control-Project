@@ -4,6 +4,7 @@
 #include "PID.h"
 #include <math.h>
 
+#define CMD_ARG 1
 // for convenience
 using json = nlohmann::json;
 
@@ -28,7 +29,11 @@ std::string hasData(std::string s) {
   return "";
 }
 
-int main(int argc, char *argv[])
+//for experimentation using command line arguments
+//int main(int argc, char *argv[])
+
+int main()
+
 {
   uWS::Hub h;
  
@@ -36,9 +41,20 @@ int main(int argc, char *argv[])
 
   // TODO: Initialize the pid variable.
   double Kp_ini, Ki_ini, Kd_ini;
+  
+/**
+  //for experimentation using command line arguments
   Kp_ini = atof(argv[1]);
   Ki_ini = atof(argv[2]);
   Kd_ini = atof(argv[3]);
+**/
+
+  //Arrived at gain values with a combination of TWIDDLE and manual tuning
+  Kp_ini = -0.6405;
+  Ki_ini = 0.00016;
+  Kd_ini = -16.00;
+
+
   pid.Init(Kp_ini, Ki_ini, Kd_ini);
 
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
@@ -74,22 +90,21 @@ int main(int argc, char *argv[])
           json msgJson;
           msgJson["steering_angle"] = steer_value;
           
-          double max_throttle = 0.8;
-          msgJson["throttle"] = 1.0 - fabs(steer_value);
-          if (msgJson["throttle"] > max_throttle)
-              msgJson["throttle"] = max_throttle;
-          /**
-          if (fabs(steer_value) > 0.8)
-            msgJson["throttle"] = -0.01;
+          if (fabs(steer_value) > 0.9)
+            msgJson["throttle"] = -0.00612;
+          else if (fabs(steer_value) > 0.8)
+            msgJson["throttle"] = 0;  
           else if (fabs(steer_value) > 0.5)
-            msgJson["throttle"] = 0.2;
+            msgJson["throttle"] = 0.3;
           else if (fabs(steer_value) > 0.3)
             msgJson["throttle"] = 0.4;
+          else if (fabs(steer_value) > 0.3)
+            msgJson["throttle"] = 0.60;
           else 
-            msgJson["throttle"] = 0.65;
-          **/
+             msgJson["throttle"] = 0.65;             
+          
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
-          std::cout << msg << std::endl;
+          //std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         }
       } else {

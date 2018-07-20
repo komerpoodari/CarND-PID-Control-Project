@@ -1,6 +1,14 @@
 #ifndef PID_H
 #define PID_H
 
+//#define TWIDDLE
+
+#ifdef TWIDDLE
+enum Tw_state { init, 
+                kp_inc, kp_dec, 
+                ki_inc, ki_dec, 
+                kd_inc, kd_dec};
+#endif //TWIDDLE
 class PID {
 public:
   /*
@@ -21,13 +29,19 @@ public:
   /* 
   * Some more useful parameters
   */
-  double time_last;
-  double time_init;
+  
 
-  double min_speed;
-  double max_speed;
-  double sum_speed;
-  unsigned int heart_beat;
+  unsigned int heart_beat, beats_per_lap;
+  
+#ifdef TWIDDLE
+
+  unsigned int this_lap;
+
+  double d_kp, d_ki, d_kd;
+
+  double cte_sum, cte_best;
+  Tw_state last_state;
+#endif  // TWIDDLE
   
   /*
   * Constructor
