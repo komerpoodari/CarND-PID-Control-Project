@@ -1,5 +1,5 @@
 # CarND-Controls-PID
-# Self-Driving Car Engineer Nanodegree Program, Term-2
+## Self-Driving Car Engineer Nanodegree Program, Term-2
 
 ---
 **This file is updated based on the assignment submission.**
@@ -28,8 +28,9 @@ made in `pid.h'
     excessive influence on steering value computation.
     
     The *TWIDDLE* related state machine is implemented. The state machine updates one of the gain
-    parameters for each lap (equivalent to one robot run in lectures). The twiddle is only enabled
+    parameters for each lap (equivalent to one robot run in lectures). The *TWIDDLE* is only enabled
     under a compile time macro. The following Figure illustrates high-level state diagram.
+    
     ![alt text][image1]
     
     The following snapshot illustrate typical *TWIDDLE* console output, which describes the 
@@ -45,17 +46,17 @@ Though the main implementation is simple, fine-tuning of gain values is time con
 I followed an iterative approach with a combination of manual and *TWIDDLE*.
 - First I identified the approximate gain values manually starting in the order Kp, Kd and Ki.
 - Then engaged *TWIDDLE* to fine tune.
-- Another dimension throttle schedule. Because of this some times, even though error is best value,
+- Another dimension is throttle schedule. Because of this some times, even though error is best value,
   the car behavior was not the best. I had to make manual decision.
 The following are the observations with gain parameters.
 ## Proportional Gain (Kp)
-This is fundamentally important. In my case, I settled on ** Kp = -0.6405 **. 
+This is fundamentally important. In my case, I settled on **Kp = -0.6405**. 
 Using `Kp` alone, I could observe the oscillating behavior as observed in the video at the link, 
 https://youtu.be/Ip1jwMwHsUw .  In absence of appropriate amount of derivative feedback 
 instability (oscillation behavior) is expected.
 
 ## Derivative Gain (Kd) Addition
-This is very important. In my case, I settled on ** Kd = -16.00**. The derivative feedback
+This is very important. In my case, I settled on **Kd = -16.00**. The derivative feedback
 offers stability to the output.
 
 Using `Kp and Kd`, I could observe reasonably stable behavior as captured in the video at 
@@ -64,7 +65,7 @@ the link, https://youtu.be/TOHkzHEoH5U . Basically derivative feedback smoothens
 ## Integral Gain (Ki) Addition
 In my observation, `Ki` impact was minor, as expected, since simulator seems to have no constant
 bias. I had reset `i_error to zero` for every lap to avoid relatively excessive accumulation of
-influence over multiple laps. In my case, I settled on ** Ki = -0.00016**. The integral feedback
+influence over multiple laps. In my case, I settled on **Ki = -0.00016**. The integral feedback
 nullifies any constant equipment bias feeding into to the output.
 
 Using `Kp, Kd and Ki`, I could observe stable behavior as captured in the video at 
